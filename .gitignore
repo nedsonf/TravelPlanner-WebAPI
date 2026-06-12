@@ -1,0 +1,21 @@
+## Build
+bin/
+obj/
+out/
+
+## IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## OS
+Thumbs.db
+.DS_Store
+
+## Logs / secrets
+*.log
+.env
+appsettings.*.local.json

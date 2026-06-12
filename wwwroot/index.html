@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TravelPlanner — Sistema de Gestão de Viagens</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+
+  <!-- ===================== LOGIN ===================== -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-brand-600 mb-4">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-bold">TravelPlanner</h1>
+        <p class="text-slate-400 mt-1">Sistema de Gestão de Viagens</p>
+      </div>
+
+      <!-- Abas Entrar / Cadastrar -->
+      <div class="flex rounded-lg bg-slate-800 p-1 mb-6">
+        <button type="button" id="tab-login"
+          class="flex-1 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white transition">
+          Entrar
+        </button>
+        <button type="button" id="tab-register"
+          class="flex-1 py-2 rounded-md text-sm font-semibold text-slate-400 hover:text-slate-200 transition">
+          Criar conta
+        </button>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">E-mail</label>
+          <input id="login-email" type="email" placeholder="seu@email.com" required
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Senha</label>
+          <input id="login-senha" type="password" required
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none" />
+        </div>
+        <button type="submit"
+          class="w-full py-3 rounded-lg bg-brand-600 hover:bg-brand-700 font-semibold transition">
+          Entrar
+        </button>
+      </form>
+
+      <form id="register-form" class="space-y-4 hidden">
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Nome completo</label>
+          <input id="reg-nome" type="text" required placeholder="Seu nome"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">E-mail</label>
+          <input id="reg-email" type="email" required placeholder="seu@email.com"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Senha</label>
+          <input id="reg-senha" type="password" required minlength="6" placeholder="Mínimo 6 caracteres"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Papel no sistema</label>
+          <select id="reg-role" required
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none">
+            <option value="Viajante">Viajante — planejar viagens e reservar</option>
+            <option value="Guia">Guia — gerenciar roteiros e pontos turísticos</option>
+          </select>
+        </div>
+
+        <div id="reg-campo-viajante">
+          <label class="block text-sm text-slate-400 mb-1">Preferências de viagem <span class="text-slate-600">(opcional)</span></label>
+          <input id="reg-preferencias" type="text" placeholder="Ex: praias, trilhas, gastronomia"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none" />
+        </div>
+        <div id="reg-campo-guia" class="hidden">
+          <label class="block text-sm text-slate-400 mb-1">Especialidade</label>
+          <input id="reg-especialidade" type="text" placeholder="Ex: ecoturismo, história regional"
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 focus:border-brand-500 focus:outline-none" />
+        </div>
+        <button type="submit"
+          class="w-full py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 font-semibold transition">
+          Cadastrar e entrar
+        </button>
+      </form>
+
+      <p id="login-error" class="mt-4 text-sm text-red-400 hidden"></p>
+
+      <!-- Área Pública (sem JWT) -->
+      <div class="mt-8 pt-6 border-t border-slate-800">
+        <h2 class="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-1">
+          Área Pública (Dados para Parceiros)
+        </h2>
+        <p class="text-xs text-slate-500 mb-3">Endpoints abertos: <code class="text-slate-400">GET /api/public/destinos</code> · <code class="text-slate-400">GET /api/public/pontos-turisticos-populares</code></p>
+        <div id="public-destinos-list" class="mt-3 grid gap-2 max-h-56 overflow-y-auto"></div>
+        <p id="public-destinos-erro" class="mt-2 text-xs text-red-400 hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <div id="dashboard" class="hidden">
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 class="text-xl font-bold">TravelPlanner — Painel de Gestão</h1>
+          <p class="text-sm text-slate-400 flex items-center gap-2">
+            <span id="user-info"></span>
+            <span id="role-badge" class="px-2 py-0.5 rounded-full text-xs font-semibold"></span>
+          </p>
+        </div>
+        <div class="flex gap-3">
+          <button id="btn-logout"
+            class="px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm transition">
+            Sair
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-10">
+      <div id="api-error" class="hidden p-4 rounded-xl bg-red-900/40 border border-red-800 text-red-200 text-sm"></div>
+
+      <!-- ========== PLANEJAR VIAGEM (VIAJANTE) ========== -->
+      <section id="section-viajante" class="hidden space-y-8">
+        <h2 class="text-lg font-bold text-sky-400 uppercase tracking-wider">✈️ Planejar minha viagem</h2>
+        <p class="text-sm text-slate-400">Escolha cidade e datas para ver clima e pontos turísticos. A hospedagem vem no pacote do guia.</p>
+
+        <div id="card-planejar" class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <form id="planejar-form" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div class="sm:col-span-2">
+              <label class="block text-sm text-slate-400 mb-1">Destino</label>
+              <select id="planejar-destino" required
+                class="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none">
+                <option value="">Carregando destinos...</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Data de ida</label>
+              <input id="planejar-inicio" type="date" required
+                class="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-sm text-slate-400 mb-1">Data de volta</label>
+              <input id="planejar-fim" type="date" required
+                class="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+            </div>
+            <div class="sm:col-span-2 lg:col-span-4">
+              <button type="submit"
+                class="px-6 py-3 rounded-lg bg-brand-600 hover:bg-brand-700 font-semibold transition">
+                Salvar e ver clima + pontos
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div id="viajante-sem-viagem" class="hidden p-4 rounded-xl bg-amber-900/30 border border-amber-800 text-amber-200 text-sm">
+          Escolha destino e datas acima e clique em <strong>Salvar e ver clima + pontos</strong>.
+        </div>
+
+        <div id="viajante-loading" class="hidden text-center py-8 text-slate-400">Carregando dados da viagem...</div>
+
+        <div id="section-destino" class="hidden">
+          <div class="bg-gradient-to-br from-brand-700 to-indigo-900 rounded-2xl p-8 shadow-xl">
+            <p class="text-brand-200 text-sm font-medium uppercase tracking-wider">Destino da Viagem</p>
+            <h2 id="destino-cidade" class="text-3xl font-bold mt-2"></h2>
+            <p id="destino-pais" class="text-brand-100 mt-1"></p>
+            <div class="flex flex-wrap gap-4 mt-6 text-sm">
+              <span id="destino-datas" class="px-3 py-1 rounded-full bg-white/10"></span>
+              <span id="destino-status" class="px-3 py-1 rounded-full bg-white/10"></span>
+              <span id="destino-coords" class="px-3 py-1 rounded-full bg-white/10"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div id="section-clima" class="hidden">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span>🌤️</span> Previsão do Clima
+              <span class="text-xs font-normal text-slate-500">(OpenWeather)</span>
+            </h3>
+            <div id="clima-grid" class="grid sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1"></div>
+            <p id="clima-vazio" class="hidden text-slate-500 text-sm">Previsão indisponível (API externa ou chave não configurada).</p>
+          </div>
+
+          <div id="section-pontos" class="hidden">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span>📍</span> Pontos Turísticos Sugeridos
+              <span class="text-xs font-normal text-slate-500">(cadastro local)</span>
+            </h3>
+            <div id="pontos-list" class="space-y-3"></div>
+            <p id="pontos-vazio" class="hidden text-slate-500 text-sm">Nenhum ponto turístico encontrado.</p>
+          </div>
+        </div>
+
+        <div id="card-cta-pacotes" class="hidden bg-violet-900/20 border border-violet-800 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold text-violet-200 mb-1">Pronto para fechar a viagem?</h3>
+          <p class="text-sm text-slate-400 mb-4">
+            Escolha um pacote de um guia abaixo. O hotel vem na oferta — ou aparece como <strong class="text-amber-300">A combinar</strong> se o guia ainda não definiu.
+          </p>
+          <button type="button" id="btn-ir-pacotes"
+            class="px-5 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-sm font-semibold transition">
+            Ver pacotes para este destino
+          </button>
+        </div>
+
+        <div id="section-propostas" class="hidden bg-slate-900 border border-sky-800/50 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold text-sky-300 mb-1">📩 Pacotes personalizados</h3>
+          <p class="text-xs text-slate-500 mb-4">Pedidos enviados aos guias e propostas recebidas.</p>
+          <div id="lista-propostas" class="space-y-3"></div>
+        </div>
+
+        <div id="section-avaliar-guia" class="hidden bg-slate-900 border border-amber-800/40 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold text-amber-300 mb-1">⭐ Avaliar guia</h3>
+          <p class="text-xs text-slate-500 mb-3">Só quem fechou pacote com o guia pode avaliar.</p>
+          <div id="lista-avaliar-guia" class="space-y-2"></div>
+        </div>
+
+        <div id="card-minhas-compras" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">🧾 Minha compra nesta viagem</h3>
+          <p class="text-xs text-slate-500 mb-3">Reservas feitas via pacotes de guias.</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-500 border-b border-slate-800">
+                  <th class="py-2 pr-3">#</th>
+                  <th class="py-2 pr-3">Pacote</th>
+                  <th class="py-2 pr-3">Hotel</th>
+                  <th class="py-2 pr-3">Status</th>
+                  <th class="py-2">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-minhas-reservas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== PACOTES PRONTOS (vitrine) ========== -->
+      <section id="section-pacotes" class="hidden space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-violet-400 uppercase tracking-wider">📦 Pacotes dos Guias</h2>
+            <p class="text-sm text-slate-400">Ofertas de parceiros — cada pacote traz roteiro, guia e hotel (quando informado).</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-sm text-slate-400">Destino:</label>
+              <select id="filtro-destino"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none">
+                <option value="">Todos os destinos</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-sm text-slate-400">Mês:</label>
+              <select id="filtro-mes"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none">
+                <option value="">Todos os meses</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="pacotes-grid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+        <p id="pacotes-vazio" class="hidden text-slate-500 text-sm">Nenhum pacote disponível para este mês.</p>
+      </section>
+
+      <!-- ========== CARTEIRA DO VIAJANTE ========== -->
+      <section id="section-carteira" class="hidden space-y-4">
+        <h2 class="text-lg font-bold text-sky-400 uppercase tracking-wider">💳 Minha Carteira</h2>
+        <p class="text-sm text-slate-400">Somente viagens com pacote reservado — planejamento sem compra não aparece aqui.</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-500 border-b border-slate-800">
+                <th class="py-2 pr-3">Destino</th>
+                <th class="py-2 pr-3">Pacote</th>
+                <th class="py-2 pr-3">Período</th>
+                <th class="py-2 pr-3">Valor</th>
+                <th class="py-2">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-carteira">
+              <tr><td colspan="5" class="py-3 text-slate-500">Nenhuma viagem ainda.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== CURADORIA DA PLATAFORMA (ADMIN) ========== -->
+      <section id="section-curadoria" class="hidden space-y-8">
+        <h2 class="text-lg font-bold text-rose-400 uppercase tracking-wider">Curadoria da Plataforma (Admin)</h2>
+        <p class="text-sm text-slate-400">Como no iFood: você cuida do catálogo base (destinos e hotéis). Os guias publicam as ofertas.</p>
+
+        <!-- Destinos — busca cidades em API de geocoding -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">🌍 Destinos</h3>
+          <p class="text-xs text-slate-500 mb-4">
+            Busque a cidade pelo nome — as coordenadas vêm automaticamente da API de geocoding (Open-Meteo).
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 mb-3">
+            <input id="destino-busca" placeholder="Digite o nome da cidade (ex: Salvador, Paris, Buenos Aires)"
+              class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+            <button id="btn-buscar-cidade"
+              class="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-sm font-semibold transition">
+              Buscar cidade
+            </button>
+          </div>
+
+          <div id="cidades-resultado" class="hidden mb-5 space-y-2 max-h-56 overflow-y-auto rounded-xl border border-slate-800 p-3 bg-slate-950/50"></div>
+
+          <h4 class="text-sm font-semibold text-slate-300 mb-2">Destinos cadastrados</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-500 border-b border-slate-800">
+                  <th class="py-2 pr-3">#</th>
+                  <th class="py-2 pr-3">Cidade</th>
+                  <th class="py-2 pr-3">País</th>
+                  <th class="py-2 pr-3">Coordenadas</th>
+                  <th class="py-2">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-destinos"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Hospedagens -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-1">🏨 Hospedagens parceiras</h3>
+            <p class="text-xs text-slate-500 mb-4">Hotéis disponíveis para os guias montarem seus pacotes.</p>
+
+            <div class="mb-4 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
+              <input id="hosp-nome" placeholder="Nome da hospedagem"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+              <input id="hosp-endereco" placeholder="Endereço"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+              <button id="btn-add-hosp"
+                class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold transition">
+                Adicionar
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-500 border-b border-slate-800">
+                    <th class="py-2 pr-3">#</th>
+                    <th class="py-2 pr-3">Nome</th>
+                    <th class="py-2 pr-3">Endereço</th>
+                    <th class="py-2 pr-3">Destino</th>
+                    <th class="py-2">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-hospedagens"></tbody>
+              </table>
+            </div>
+        </div>
+      </section>
+
+      <!-- ========== MINHAS OFERTAS (GUIA) ========== -->
+      <section id="section-ofertas-guia" class="hidden space-y-8">
+        <h2 class="text-lg font-bold text-emerald-400 uppercase tracking-wider">Minhas Ofertas (Guia)</h2>
+        <p class="text-sm text-slate-400">Como parceiro na plataforma: publique pacotes com seu preço e roteiro. A plataforma retém 10% por venda.</p>
+
+        <div id="section-pedidos-guia" class="bg-slate-900 border border-emerald-800/50 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold text-emerald-300 mb-1">📩 Pedidos personalizados</h3>
+          <p class="text-xs text-slate-500 mb-4">Viajantes que solicitaram um pacote sob medida — monte a proposta com preço do hotel.</p>
+          <div id="lista-pedidos-guia" class="space-y-3"></div>
+        </div>
+
+        <!-- Pacotes -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">📦 Pacotes Prontos</h3>
+          <p class="text-xs text-slate-500 mb-4">
+            Use destinos e hotéis cadastrados pelo admin para montar sua oferta.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
+            <input id="pacote-titulo" placeholder="Título (ex: Rio Essencial — 5 dias)"
+              class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+            <select id="pacote-destino"
+              class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none">
+              <option value="">Destino...</option>
+            </select>
+            <select id="pacote-hospedagem"
+              class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none">
+              <option value="">A combinar (sem hotel definido)</option>
+            </select>
+            <input id="pacote-inicio" type="date"
+              class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+            <input id="pacote-fim" type="date"
+              class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+            <input id="pacote-preco" type="number" min="0" step="0.01" placeholder="Preço total (R$)"
+              class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+          </div>
+          <textarea id="pacote-dias" rows="4"
+            placeholder="Roteiro dia a dia — um dia por linha:&#10;Chegada e check-in&#10;Passeio pelos pontos principais&#10;Dia livre e retorno"
+            class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none mb-3"></textarea>
+          <button id="btn-add-pacote"
+            class="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold transition mb-5">
+            Publicar pacote
+          </button>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-500 border-b border-slate-800">
+                  <th class="py-2 pr-3">#</th>
+                  <th class="py-2 pr-3">Título</th>
+                  <th class="py-2 pr-3">Destino</th>
+                  <th class="py-2 pr-3">Período</th>
+                  <th class="py-2 pr-3">Hotel</th>
+                  <th class="py-2 pr-3">Preço</th>
+                  <th class="py-2">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-pacotes"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid xl:grid-cols-2 gap-8">
+          <!-- Pontos turísticos -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-1">📍 Pontos Turísticos</h3>
+            <p class="text-xs text-slate-500 mb-4">Seu conhecimento local para enriquecer os roteiros.</p>
+
+            <div class="mb-4 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
+              <input id="ponto-nome" placeholder="Nome do ponto"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+              <input id="ponto-categoria" placeholder="Categoria"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+              <button id="btn-add-ponto"
+                class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold transition">
+                Adicionar
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-500 border-b border-slate-800">
+                    <th class="py-2 pr-3">#</th>
+                    <th class="py-2 pr-3">Nome</th>
+                    <th class="py-2 pr-3">Categoria</th>
+                    <th class="py-2 pr-3">Destino</th>
+                    <th class="py-2">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-pontos"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Roteiros diários -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-1">🗓️ Roteiros Diários</h3>
+            <p class="text-xs text-slate-500 mb-4">Detalhe o dia a dia das viagens que você acompanha.</p>
+
+            <div class="mb-4 grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-2">
+              <input id="roteiro-data" type="date"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+              <input id="roteiro-descricao" placeholder="Descrição do dia (ex: Trilha nas dunas do Jalapão)"
+                class="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm focus:border-brand-500 focus:outline-none" />
+              <button id="btn-add-roteiro"
+                class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold transition">
+                Adicionar dia
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-500 border-b border-slate-800">
+                    <th class="py-2 pr-3">#</th>
+                    <th class="py-2 pr-3">Data</th>
+                    <th class="py-2 pr-3">Descrição</th>
+                    <th class="py-2">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-roteiros"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== PAINEL DE VENDAS (GUIA) ========== -->
+      <section id="section-vendas-guia" class="hidden space-y-8">
+        <h2 class="text-lg font-bold text-emerald-400 uppercase tracking-wider">Painel de Vendas (Guia)</h2>
+        <p class="text-sm text-slate-400">Faturamento das suas vendas de pacotes — taxa da plataforma descontada automaticamente.</p>
+
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <p class="text-xs text-slate-500 uppercase">Faturamento Bruto</p>
+            <p id="guia-bruto" class="text-2xl font-bold text-emerald-300 mt-1">—</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <p class="text-xs text-slate-500 uppercase">Taxa Plataforma</p>
+            <p id="guia-taxa" class="text-2xl font-bold text-rose-300 mt-1">—</p>
+            <p id="guia-taxa-pct" class="text-xs text-slate-500 mt-1"></p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <p class="text-xs text-slate-500 uppercase">Faturamento Líquido</p>
+            <p id="guia-liquido" class="text-2xl font-bold text-sky-300 mt-1">—</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-4">Minhas vendas</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-500 border-b border-slate-800">
+                  <th class="py-2 pr-3">Pacote</th>
+                  <th class="py-2 pr-3">Destino</th>
+                  <th class="py-2 pr-3">Bruto</th>
+                  <th class="py-2 pr-3">Taxa</th>
+                  <th class="py-2">Líquido</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-vendas-guia"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== MÓDULO FINANCEIRO (ADMIN) ========== -->
+      <section id="section-financeiro" class="hidden space-y-8">
+        <h2 class="text-lg font-bold text-rose-400 uppercase tracking-wider">Extrato da Plataforma (Admin)</h2>
+        <p class="text-sm text-slate-400">Visão macro do volume financeiro e receita de intermediação do software.</p>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <p class="text-xs text-slate-500 uppercase">Volume Total</p>
+            <p id="fin-volume" class="text-2xl font-bold text-emerald-300 mt-1">—</p>
+          </div>
+          <div class="bg-slate-900 border border-rose-800/50 rounded-2xl p-5 border-2">
+            <p class="text-xs text-rose-400 uppercase font-semibold">Receita Plataforma (Taxa)</p>
+            <p id="fin-taxa-plataforma" class="text-2xl font-bold text-rose-300 mt-1">—</p>
+            <p id="fin-taxa-pct" class="text-xs text-slate-500 mt-1"></p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <p class="text-xs text-slate-500 uppercase">Repasse aos Guias</p>
+            <p id="fin-repasse" class="text-2xl font-bold text-sky-300 mt-1">—</p>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <p class="text-xs text-slate-500 uppercase">Vendas Realizadas</p>
+            <p id="fin-qtd-vendas" class="text-2xl font-bold text-slate-200 mt-1">—</p>
+          </div>
+        </div>
+
+        <div class="grid xl:grid-cols-2 gap-8">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4">💸 Extrato de Despesas</h3>
+            <div class="overflow-x-auto max-h-80 overflow-y-auto">
+              <table class="w-full text-sm">
+                <thead class="sticky top-0 bg-slate-900">
+                  <tr class="text-left text-slate-500 border-b border-slate-800">
+                    <th class="py-2 pr-3">#</th>
+                    <th class="py-2 pr-3">Descrição</th>
+                    <th class="py-2 pr-3">Categoria</th>
+                    <th class="py-2 pr-3">Valor</th>
+                    <th class="py-2 pr-3">Reserva</th>
+                    <th class="py-2">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-despesas"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4">🧾 Reservas do Sistema</h3>
+            <div class="overflow-x-auto max-h-80 overflow-y-auto">
+              <table class="w-full text-sm">
+                <thead class="sticky top-0 bg-slate-900">
+                  <tr class="text-left text-slate-500 border-b border-slate-800">
+                    <th class="py-2 pr-3">#</th>
+                    <th class="py-2 pr-3">Hospedagem</th>
+                    <th class="py-2 pr-3">Status</th>
+                    <th class="py-2 pr-3">Valor</th>
+                    <th class="py-2 pr-3">Taxa</th>
+                    <th class="py-2">Guia</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-reservas"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== ÁREA PÚBLICA ========== -->
+      <section class="bg-slate-900 border border-amber-800/50 rounded-2xl p-6">
+        <h3 class="text-lg font-semibold text-amber-400 mb-1">Área Pública (Dados para Parceiros)</h3>
+        <p class="text-slate-400 text-sm mb-4">
+          Consumo sem autenticação — <code class="text-amber-300">GET /api/public/destinos</code>
+          (inclui pontos turísticos em destaque por cidade)
+        </p>
+        <p id="public-destinos-contagem" class="text-xs text-slate-500 hidden"></p>
+        <div id="public-destinos-dashboard" class="mt-3 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[28rem] overflow-y-auto"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Perfil do Guia -->
+  <div id="modal-guia" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 id="modal-guia-nome" class="text-xl font-bold"></h3>
+          <p id="modal-guia-especialidade" class="text-sm text-slate-400"></p>
+          <p id="modal-guia-rating" class="text-amber-300 font-semibold mt-1"></p>
+        </div>
+        <button type="button" id="modal-guia-fechar" class="text-slate-500 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+      <h4 class="text-sm font-semibold text-slate-300 mb-2">Avaliações de viajantes</h4>
+      <div id="modal-guia-avaliacoes" class="space-y-2 mb-5 max-h-48 overflow-y-auto"></div>
+      <button type="button" id="btn-solicitar-pacote"
+        class="w-full py-3 rounded-lg bg-amber-600 hover:bg-amber-700 font-semibold transition hidden">
+        Solicitar pacote personalizado
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: Solicitar pacote -->
+  <div id="modal-solicitar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6">
+      <h3 class="text-lg font-bold mb-1">Solicitar pacote ao guia</h3>
+      <p id="modal-solicitar-guia" class="text-sm text-amber-300 mb-4"></p>
+      <form id="form-solicitar" class="space-y-3">
+        <input type="hidden" id="sol-guia-id" />
+        <div>
+          <label class="text-sm text-slate-400">Destino</label>
+          <select id="sol-destino" required class="w-full mt-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-sm text-slate-400">Ida</label>
+            <input id="sol-inicio" type="date" required class="w-full mt-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm" />
+          </div>
+          <div>
+            <label class="text-sm text-slate-400">Volta</label>
+            <input id="sol-fim" type="date" required class="w-full mt-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm" />
+          </div>
+        </div>
+        <div>
+          <label class="text-sm text-slate-400">Categoria do hotel</label>
+          <select id="sol-hotel-cat" required class="w-full mt-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm">
+            <option value="Entrada">Entrada</option>
+            <option value="Padrao" selected>Padrão</option>
+            <option value="Conforto">Conforto</option>
+            <option value="Luxo">Luxo</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-slate-400">Observações</label>
+          <textarea id="sol-obs" rows="3" placeholder="Ex: quero ficar perto do centro histórico..."
+            class="w-full mt-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm"></textarea>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" id="modal-solicitar-cancelar" class="flex-1 py-2 rounded-lg border border-slate-600 text-sm">Cancelar</button>
+          <button type="submit" class="flex-1 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 font-semibold text-sm">Enviar pedido</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Guia responder pedido -->
+  <div id="modal-responder" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+      <h3 class="text-lg font-bold mb-1">Montar proposta</h3>
+      <p id="modal-responder-info" class="text-xs text-slate-500 mb-4"></p>
+      <form id="form-responder" class="space-y-3">
+        <input type="hidden" id="resp-solicitacao-id" />
+        <input id="resp-titulo" placeholder="Título do pacote" required class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm" />
+        <select id="resp-hospedagem" class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm">
+          <option value="">Hotel: A combinar</option>
+        </select>
+        <input id="resp-preco" type="number" min="0" step="0.01" placeholder="Preço total (R$)" required
+          class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm" />
+        <textarea id="resp-dias" rows="4" placeholder="Roteiro — um dia por linha" required
+          class="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm"></textarea>
+        <div class="flex gap-2">
+          <button type="button" id="modal-responder-cancelar" class="flex-1 py-2 rounded-lg border border-slate-600 text-sm">Cancelar</button>
+          <button type="submit" class="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 font-semibold text-sm">Enviar proposta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"
+    class="hidden fixed bottom-6 right-6 max-w-sm px-5 py-4 rounded-xl shadow-2xl border text-sm z-50"></div>
+
+  <script>
+    const STORAGE_TOKEN = 'travelplanner_token';
+    const VIAGEM_DEMO_ID = 1;
+    const ROLE_CLAIM_URI = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+    const EMAIL_CLAIM_URI = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress';
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentRole = null;
+    let viagemId = null;
+    let viagemAtual = null;
+    let viagemDestinoId = null;
+    let viagemDoViajante = false;
+
+    function resetEstadoViagem() {
+      viagemId = null;
+      viagemAtual = null;
+      viagemDestinoId = null;
+      viagemDoViajante = false;
+      $('api-error').classList.add('hidden');
+    }
+
+    // ---------- Utilidades ----------
+    function getToken() {
+      return localStorage.getItem(STORAGE_TOKEN);
+    }
+
+    function parseJwt(token) {
+      try {
+        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const json = decodeURIComponent(
+          atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(json);
+      } catch {
+        return null;
+      }
+    }
+
+    function getClaimsFromToken(token) {
+      const payload = parseJwt(token);
+      if (!payload) return { role: null, email: null };
+      return {
+        role: payload.role || payload[ROLE_CLAIM_URI] || null,
+        email: payload.email || payload[EMAIL_CLAIM_URI] || null
+      };
+    }
+
+    function formatMoney(v) {
+      return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatDateTime(iso) {
+      return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = $('toast');
+      toast.textContent = message;
+      toast.className = `fixed bottom-6 right-6 max-w-sm px-5 py-4 rounded-xl shadow-2xl border text-sm z-50 ${
+        type === 'success'
+          ? 'bg-emerald-900/90 border-emerald-700 text-emerald-100'
+          : 'bg-red-900/90 border-red-700 text-red-100'
+      }`;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 6000);
+    }
+
+    function showLoginError(msg) {
+      const el = $('login-error');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function showAuthTab(tab) {
+      const isLogin = tab === 'login';
+      $('login-form').classList.toggle('hidden', !isLogin);
+      $('register-form').classList.toggle('hidden', isLogin);
+      $('tab-login').className = isLogin
+        ? 'flex-1 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white transition'
+        : 'flex-1 py-2 rounded-md text-sm font-semibold text-slate-400 hover:text-slate-200 transition';
+      $('tab-register').className = isLogin
+        ? 'flex-1 py-2 rounded-md text-sm font-semibold text-slate-400 hover:text-slate-200 transition'
+        : 'flex-1 py-2 rounded-md text-sm font-semibold bg-emerald-600 text-white transition';
+      $('login-error').classList.add('hidden');
+    }
+
+    function atualizarCamposRegistro() {
+      const role = $('reg-role').value;
+      $('reg-campo-viajante').classList.toggle('hidden', role !== 'Viajante');
+      $('reg-campo-guia').classList.toggle('hidden', role !== 'Guia');
+    }
+
+    // ---------- HTTP (caminhos relativos — mesma origem da API) ----------
+    async function apiFetch(path, options = {}) {
+      const token = getToken();
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers
+      };
+
+      try {
+        const response = await fetch(path, { ...options, headers });
+
+        if (response.status === 403) {
+          throw new Error('Acesso negado (403): seu papel não tem permissão para esta operação.');
+        }
+
+        if (!response.ok) {
+          const body = await response.text();
+          let message = `Erro ${response.status}`;
+          try { message = JSON.parse(body).message || message; } catch { /* ignore */ }
+          throw new Error(message);
+        }
+
+        if (response.status === 204) return null;
+        return response.json();
+      } catch (err) {
+        if (err.message === 'Failed to fetch') {
+          throw new Error('Falha de conexão com a API.');
+        }
+        throw err;
+      }
+    }
+
+    async function publicFetch(path) {
+      const response = await fetch(path, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) throw new Error(`Erro ${response.status} ao consultar endpoint público`);
+      return response.json();
+    }
+
+    // ---------- RBAC / Visibilidade ----------
+    function applyRoleVisibility(role) {
+      currentRole = role;
+
+      const isViajante = role === 'Viajante';
+      const isGuia = role === 'Guia';
+      const isAdmin = role === 'Admin';
+
+      $('section-pacotes').classList.remove('hidden');
+      $('section-viajante').classList.toggle('hidden', !isViajante);
+      $('section-carteira').classList.toggle('hidden', !isViajante);
+      $('section-curadoria').classList.toggle('hidden', !isAdmin);
+      $('section-ofertas-guia').classList.toggle('hidden', !isGuia);
+      $('section-financeiro').classList.toggle('hidden', !isAdmin);
+      $('section-vendas-guia').classList.toggle('hidden', !isGuia);
+
+      const badge = $('role-badge');
+      const styles = {
+        Viajante: 'bg-sky-900/60 text-sky-200 border border-sky-700',
+        Guia: 'bg-emerald-900/60 text-emerald-200 border border-emerald-700',
+        Admin: 'bg-rose-900/60 text-rose-200 border border-rose-700'
+      };
+      badge.textContent = role === 'Admin' ? 'Administrador' : (role || 'Desconhecido');
+      badge.className = `px-2 py-0.5 rounded-full text-xs font-semibold ${styles[role] || 'bg-slate-800 text-slate-300'}`;
+    }
+
+    function enterDashboard(email, role) {
+      resetEstadoViagem();
+      $('login-screen').classList.add('hidden');
+      $('dashboard').classList.remove('hidden');
+      $('user-info').textContent = email ? `Conectado como ${email}` : 'Sessão ativa';
+      applyRoleVisibility(role);
+      carregarTudo();
+    }
+
+    function carregarTudo() {
+      carregarFiltrosPacotes();
+      carregarPacotesVitrine();
+
+      if (currentRole === 'Viajante') {
+        carregarCarteira();
+        inicializarViagemViajante();
+        carregarPropostasViajante();
+        carregarAvaliacoesPendentes();
+      }
+
+      carregarDestinosPublicos('public-destinos-dashboard', null, 'public-destinos-contagem');
+
+      if (currentRole === 'Guia') {
+        carregarPedidosGuia();
+        carregarSelectsPacote();
+        carregarPacotesGestao();
+        carregarPontos();
+        carregarRoteiros();
+        carregarVendasGuia();
+      }
+      if (currentRole === 'Admin') {
+        carregarHospedagens();
+        carregarFinanceiro();
+        carregarDestinosAdmin();
+      }
+    }
+
+    // ---------- Planejamento da viagem (Viajante) ----------
+    function labelHotelPacote(hospedagemNome) {
+      return hospedagemNome
+        ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-900/50 text-sky-200 text-xs border border-sky-800">🏨 Hotel: ${escapeHtml(hospedagemNome)}</span>`
+        : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-900/40 text-amber-200 text-xs border border-amber-800">🏨 Hotel: A combinar</span>`;
+    }
+
+    function formatRating(rating) {
+      const n = Number(rating);
+      return Number.isFinite(n) && n > 0 ? n.toFixed(1) : '—';
+    }
+
+    function stripGuiaPacote(p) {
+      if (!p.guiaId || !p.guiaNome) return '';
+      const qtd = p.guiaTotalAvaliacoes || 0;
+      return `
+        <button type="button" data-ver-guia="${p.guiaId}"
+          class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-amber-950/40 border border-amber-700/50 hover:bg-amber-900/50 hover:border-amber-600/60 transition text-left group">
+          <span class="text-sm text-amber-100/90 group-hover:text-amber-50">${escapeHtml(p.guiaNome)}</span>
+          <span class="text-sm font-bold text-amber-300">${formatRating(p.guiaRating)} <span class="text-amber-400">★</span>
+            <span class="text-xs font-normal text-amber-500/90 ml-1">(${qtd})</span></span>
+        </button>`;
+    }
+
+    let guiaModalAtual = null;
+
+    async function abrirPerfilGuia(guiaId) {
+      try {
+        const perfil = await apiFetch(`/api/guias/${guiaId}/perfil`);
+        guiaModalAtual = guiaId;
+        $('modal-guia-nome').textContent = perfil.nome;
+        $('modal-guia-especialidade').textContent = perfil.especialidade;
+        $('modal-guia-rating').textContent = `${formatRating(perfil.rating)} ★ · ${perfil.totalAvaliacoes} avaliação(ões)`;
+        const box = $('modal-guia-avaliacoes');
+        box.innerHTML = '';
+        if (!perfil.avaliacoes?.length) {
+          box.innerHTML = '<p class="text-xs text-slate-500">Nenhuma avaliação ainda.</p>';
+        } else {
+          perfil.avaliacoes.forEach(a => {
+            const el = document.createElement('div');
+            el.className = 'p-3 rounded-lg bg-slate-800/80 border border-slate-700 text-sm';
+            el.innerHTML = `
+              <div class="flex justify-between"><span class="font-medium text-amber-200">${a.nota} ★</span>
+                <span class="text-xs text-slate-500">${escapeHtml(a.viajanteNome)}</span></div>
+              ${a.comentario ? `<p class="text-slate-400 mt-1 text-xs">${escapeHtml(a.comentario)}</p>` : ''}`;
+            box.appendChild(el);
+          });
+        }
+        $('btn-solicitar-pacote').classList.toggle('hidden', currentRole !== 'Viajante');
+        $('modal-guia').classList.remove('hidden');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function fecharModalGuia() {
+      $('modal-guia').classList.add('hidden');
+      guiaModalAtual = null;
+    }
+
+    async function abrirModalSolicitar() {
+      if (!guiaModalAtual) return;
+      $('sol-guia-id').value = guiaModalAtual;
+      $('modal-solicitar-guia').textContent = `Pedido para o guia #${guiaModalAtual}`;
+      const destinos = await publicFetch('/api/public/destinos');
+      const sel = $('sol-destino');
+      sel.innerHTML = '';
+      destinos.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `${d.nome}, ${d.pais}`;
+        sel.appendChild(opt);
+      });
+      if ($('planejar-destino').value) sel.value = $('planejar-destino').value;
+      if ($('planejar-inicio').value) $('sol-inicio').value = $('planejar-inicio').value;
+      if ($('planejar-fim').value) $('sol-fim').value = $('planejar-fim').value;
+      fecharModalGuia();
+      $('modal-solicitar').classList.remove('hidden');
+    }
+
+    async function enviarSolicitacao(e) {
+      e.preventDefault();
+      try {
+        await apiFetch('/api/solicitacoes-pacote', {
+          method: 'POST',
+          body: JSON.stringify({
+            guiaId: Number($('sol-guia-id').value),
+            destinoId: Number($('sol-destino').value),
+            dataInicio: $('sol-inicio').value,
+            dataFim: $('sol-fim').value,
+            categoriaHotel: $('sol-hotel-cat').value,
+            observacoes: $('sol-obs').value.trim() || null
+          })
+        });
+        $('modal-solicitar').classList.add('hidden');
+        showToast('Pedido enviado ao guia!');
+        await carregarPropostasViajante();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function carregarPropostasViajante() {
+      if (currentRole !== 'Viajante') return;
+      try {
+        const lista = await apiFetch('/api/solicitacoes-pacote/minhas');
+        const box = $('lista-propostas');
+        box.innerHTML = '';
+        $('section-propostas').classList.toggle('hidden', lista.length === 0);
+        if (lista.length === 0) return;
+
+        lista.forEach(s => {
+          const el = document.createElement('div');
+          el.className = 'p-4 rounded-xl border border-slate-700 bg-slate-800/50';
+          const statusCor = s.status === 'Confirmada' ? 'text-emerald-300'
+            : s.status === 'PropostaEnviada' ? 'text-sky-300' : 'text-amber-300';
+          el.innerHTML = `
+            <div class="flex flex-wrap justify-between gap-2 mb-2">
+              <span class="font-medium">${escapeHtml(s.destinoNome)} · ${escapeHtml(s.guiaNome || '')}</span>
+              <span class="text-xs ${statusCor}">${escapeHtml(s.status)}</span>
+            </div>
+            <p class="text-xs text-slate-500">${formatDate(s.dataInicio)} → ${formatDate(s.dataFim)} · Hotel ${escapeHtml(s.categoriaHotel)}</p>
+            ${s.observacoes ? `<p class="text-xs text-slate-400 mt-1">${escapeHtml(s.observacoes)}</p>` : ''}
+            ${s.pacoteTitulo ? `<p class="text-sm text-slate-300 mt-2"><strong>${escapeHtml(s.pacoteTitulo)}</strong> — ${formatMoney(s.pacotePreco)}
+              ${s.pacoteHospedagem ? `<br><span class="text-xs">🏨 ${escapeHtml(s.pacoteHospedagem)}</span>` : ''}</p>` : ''}
+            ${s.status === 'PropostaEnviada' ? `<button data-confirmar-sol="${s.id}" class="mt-3 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold">Confirmar reserva</button>` : ''}`;
+          box.appendChild(el);
+        });
+
+        box.querySelectorAll('[data-confirmar-sol]').forEach(btn =>
+          btn.addEventListener('click', () => confirmarProposta(btn.dataset.confirmarSol)));
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function confirmarProposta(id) {
+      try {
+        const r = await apiFetch(`/api/solicitacoes-pacote/${id}/confirmar`, { method: 'POST' });
+        showToast(`Pacote confirmado! Viagem #${r.viagemId} — ${formatMoney(r.valorTotal)}`);
+        await carregarCarteira();
+        await carregarPropostasViajante();
+        await carregarAvaliacoesPendentes();
+        viagemId = r.viagemId;
+        viagemDoViajante = true;
+        mostrarPainelViagem();
+        await carregarResumo();
+        await carregarMinhasReservas();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function carregarPedidosGuia() {
+      if (currentRole !== 'Guia') return;
+      try {
+        const lista = await apiFetch('/api/solicitacoes-pacote/pedidos');
+        const box = $('lista-pedidos-guia');
+        box.innerHTML = '';
+        const pendentes = lista.filter(s => s.status === 'Pendente');
+        if (pendentes.length === 0) {
+          box.innerHTML = '<p class="text-sm text-slate-500">Nenhum pedido pendente.</p>';
+          return;
+        }
+        pendentes.forEach(s => {
+          const el = document.createElement('div');
+          el.className = 'p-4 rounded-xl border border-emerald-800/40 bg-slate-800/50';
+          el.innerHTML = `
+            <p class="font-medium">${escapeHtml(s.viajanteNome)} → ${escapeHtml(s.destinoNome)}</p>
+            <p class="text-xs text-slate-500 mt-1">${formatDate(s.dataInicio)} → ${formatDate(s.dataFim)} · Hotel ${escapeHtml(s.categoriaHotel)}</p>
+            ${s.observacoes ? `<p class="text-xs text-slate-400 mt-2">${escapeHtml(s.observacoes)}</p>` : ''}
+            <button data-responder-sol="${s.id}" data-destino-nome="${escapeHtml(s.destinoNome)}" data-destino-id="${s.destinoId}"
+              class="mt-3 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-semibold">Montar proposta</button>`;
+          box.appendChild(el);
+        });
+        box.querySelectorAll('[data-responder-sol]').forEach(btn =>
+          btn.addEventListener('click', () => abrirModalResponder(btn.dataset.responderSol, btn.dataset.destinoNome, Number(btn.dataset.destinoId))));
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function abrirModalResponder(solicitacaoId, destinoNome, destinoId) {
+      $('resp-solicitacao-id').value = solicitacaoId;
+      $('modal-responder-info').textContent = `Pedido para ${destinoNome}`;
+      const hospedagens = await apiFetch('/api/hospedagens');
+      const sel = $('resp-hospedagem');
+      sel.innerHTML = '<option value="">Hotel: A combinar</option>';
+      if (destinoId) {
+        hospedagens.filter(h => h.destinoId === destinoId).forEach(h => {
+          const opt = document.createElement('option');
+          opt.value = h.id;
+          opt.textContent = h.nome;
+          sel.appendChild(opt);
+        });
+      }
+      $('modal-responder').classList.remove('hidden');
+    }
+
+    async function enviarPropostaGuia(e) {
+      e.preventDefault();
+      const id = $('resp-solicitacao-id').value;
+      const hospedagemId = Number($('resp-hospedagem').value) || null;
+      try {
+        await apiFetch(`/api/solicitacoes-pacote/${id}/proposta`, {
+          method: 'POST',
+          body: JSON.stringify({
+            titulo: $('resp-titulo').value.trim(),
+            hospedagemId,
+            preco: Number($('resp-preco').value),
+            dias: $('resp-dias').value.split('\n').map(l => l.trim()).filter(Boolean)
+          })
+        });
+        $('modal-responder').classList.add('hidden');
+        showToast('Proposta enviada ao viajante!');
+        await carregarPedidosGuia();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function carregarAvaliacoesPendentes() {
+      if (currentRole !== 'Viajante') return;
+      try {
+        const lista = await apiFetch('/api/guias/minhas-reservas-avaliaveis');
+        const box = $('lista-avaliar-guia');
+        box.innerHTML = '';
+        $('section-avaliar-guia').classList.toggle('hidden', lista.length === 0);
+        lista.forEach(r => {
+          const el = document.createElement('div');
+          el.className = 'flex flex-wrap items-center gap-2 p-3 rounded-lg bg-slate-800 border border-slate-700';
+          el.innerHTML = `
+            <span class="text-sm flex-1">${escapeHtml(r.guiaNome)} — ${escapeHtml(r.pacoteTitulo || 'Pacote')}</span>
+            <select data-nota-reserva="${r.id}" data-guia-id="${r.guiaId}" class="px-2 py-1 rounded bg-slate-900 border border-slate-600 text-sm">
+              <option value="5">5 ★</option><option value="4">4 ★</option><option value="3">3 ★</option>
+              <option value="2">2 ★</option><option value="1">1 ★</option>
+            </select>
+            <button data-avaliar-reserva="${r.id}" data-guia-id="${r.guiaId}"
+              class="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-xs font-semibold">Avaliar</button>`;
+          box.appendChild(el);
+        });
+        box.querySelectorAll('[data-avaliar-reserva]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const reservaId = Number(btn.dataset.avaliarReserva);
+            const guiaId = Number(btn.dataset.guiaId);
+            const nota = Number(box.querySelector(`[data-nota-reserva="${reservaId}"]`).value);
+            try {
+              await apiFetch(`/api/guias/${guiaId}/avaliacoes`, {
+                method: 'POST',
+                body: JSON.stringify({ reservaId, nota })
+              });
+              showToast('Avaliação enviada!');
+              await carregarAvaliacoesPendentes();
+              await carregarPacotesVitrine();
+            } catch (err) {
+              showToast(err.message, 'error');
+            }
+          });
+        });
+      } catch { /* ignora */ }
+    }
+
+    function sincronizarFiltrosComPlanejamento() {
+      const destinoId = $('planejar-destino').value;
+      const inicio = $('planejar-inicio').value;
+      if (destinoId) $('filtro-destino').value = destinoId;
+      if (inicio) {
+        const d = new Date(inicio + 'T12:00:00');
+        $('filtro-mes').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      }
+      return carregarPacotesVitrine();
+    }
+
+    function ocultarPainelViagem() {
+      $('section-destino').classList.add('hidden');
+      $('section-clima').classList.add('hidden');
+      $('section-pontos').classList.add('hidden');
+      $('card-cta-pacotes').classList.add('hidden');
+      $('card-minhas-compras').classList.add('hidden');
+      $('viajante-sem-viagem').classList.remove('hidden');
+    }
+
+    function mostrarPainelViagem() {
+      $('viajante-sem-viagem').classList.add('hidden');
+      $('card-cta-pacotes').classList.remove('hidden');
+    }
+
+    function preencherFormPlanejamento(viagem) {
+      $('planejar-destino').value = String(viagem.destinoId);
+      $('planejar-inicio').value = viagem.dataInicio.split('T')[0];
+      $('planejar-fim').value = viagem.dataFim.split('T')[0];
+    }
+
+    function definirDatasPadraoPlanejamento() {
+      const inicio = new Date();
+      inicio.setDate(inicio.getDate() + 30);
+      const fim = new Date(inicio);
+      fim.setDate(fim.getDate() + 7);
+      $('planejar-inicio').value = inicio.toISOString().split('T')[0];
+      $('planejar-fim').value = fim.toISOString().split('T')[0];
+    }
+
+    async function carregarDestinosPlanejamento() {
+      const destinos = await publicFetch('/api/public/destinos');
+      const select = $('planejar-destino');
+      select.innerHTML = '<option value="">Selecione um destino</option>';
+      destinos.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `${d.nome}, ${d.pais}`;
+        select.appendChild(opt);
+      });
+      return destinos;
+    }
+
+    async function inicializarViagemViajante() {
+      ocultarPainelViagem();
+      try {
+        await carregarDestinosPlanejamento();
+        definirDatasPadraoPlanejamento();
+
+        const viagem = await apiFetch('/api/viagens/minha/atual');
+        viagemId = viagem.id;
+        viagemDestinoId = viagem.destinoId;
+        viagemDoViajante = true;
+        preencherFormPlanejamento(viagem);
+        mostrarPainelViagem();
+        await carregarResumo();
+        await carregarMinhasReservas();
+      } catch (err) {
+        if (err.message.includes('404') || err.message.includes('Nenhuma viagem planejada')) {
+          resetEstadoViagem();
+          ocultarPainelViagem();
+        } else {
+          showToast(err.message, 'error');
+        }
+      }
+    }
+
+    async function salvarPlanejamento(e) {
+      e.preventDefault();
+
+      const destinoId = Number($('planejar-destino').value);
+      const dataInicio = $('planejar-inicio').value;
+      const dataFim = $('planejar-fim').value;
+
+      if (!destinoId || !dataInicio || !dataFim) {
+        showToast('Preencha destino e datas da viagem.', 'error');
+        return;
+      }
+
+      if (new Date(dataFim) < new Date(dataInicio)) {
+        showToast('A data de volta deve ser posterior à data de ida.', 'error');
+        return;
+      }
+
+      try {
+        const payload = { destinoId, dataInicio, dataFim, status: 'Planejada' };
+        const viagem = (viagemDoViajante && viagemId)
+          ? await apiFetch(`/api/viagens/${viagemId}`, { method: 'PUT', body: JSON.stringify(payload) })
+          : await apiFetch('/api/viagens', { method: 'POST', body: JSON.stringify(payload) });
+
+        viagemId = viagem.id;
+        viagemDestinoId = viagem.destinoId;
+        viagemDoViajante = true;
+        mostrarPainelViagem();
+        showToast(`Viagem planejada para ${viagem.destinoNome}!`);
+        await carregarResumo();
+        await carregarMinhasReservas();
+        await sincronizarFiltrosComPlanejamento();
+        $('section-pacotes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Visão do Viajante ----------
+    function renderResumo(data) {
+      viagemAtual = data;
+      viagemId = data.viagemId;
+      viagemDestinoId = data.destino.id;
+      $('api-error').classList.add('hidden');
+      $('viajante-loading').classList.add('hidden');
+
+      const destino = data.destino;
+      $('section-destino').classList.remove('hidden');
+      $('destino-cidade').textContent = destino.cidade;
+      $('destino-pais').textContent = destino.pais;
+      $('destino-datas').textContent = `${formatDate(data.dataInicio)} → ${formatDate(data.dataFim)}`;
+      $('destino-status').textContent = `Status: ${data.status}`;
+      $('destino-coords').textContent = `${destino.latitude.toFixed(4)}, ${destino.longitude.toFixed(4)}`;
+
+      $('section-clima').classList.remove('hidden');
+      const climaGrid = $('clima-grid');
+      climaGrid.innerHTML = '';
+      const previsao = data.previsaoClima || [];
+
+      if (previsao.length === 0) {
+        $('clima-vazio').classList.remove('hidden');
+      } else {
+        $('clima-vazio').classList.add('hidden');
+        previsao.slice(0, 8).forEach((item) => {
+          const card = document.createElement('div');
+          card.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4';
+          card.innerHTML = `
+            <p class="text-xs text-slate-500">${formatDateTime(item.dataHora)}</p>
+            <p class="text-2xl font-bold mt-1">${item.temperatura.toFixed(1)}°C</p>
+            <p class="text-sm text-slate-300 capitalize mt-1">${escapeHtml(item.descricao)}</p>
+            <p class="text-xs text-slate-500 mt-2">Umidade: ${item.umidade}%</p>
+          `;
+          climaGrid.appendChild(card);
+        });
+      }
+
+      $('section-pontos').classList.remove('hidden');
+      const pontosList = $('pontos-list');
+      pontosList.innerHTML = '';
+      const pontos = data.pontosTuristicosSugeridos || [];
+
+      if (pontos.length === 0) {
+        $('pontos-vazio').classList.remove('hidden');
+      } else {
+        $('pontos-vazio').classList.add('hidden');
+        pontos.forEach((ponto, i) => {
+          const card = document.createElement('div');
+          card.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4 flex gap-4';
+          card.innerHTML = `
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-brand-600/30 flex items-center justify-center font-bold text-brand-400">${i + 1}</div>
+            <div>
+              <p class="font-semibold">${escapeHtml(ponto.nome) || 'Sem nome'}</p>
+              <p class="text-sm text-slate-400 capitalize">${escapeHtml((ponto.categoria || '').replace(/,/g, ', '))}</p>
+              <p class="text-xs text-slate-500 mt-1">${ponto.latitude.toFixed(4)}, ${ponto.longitude.toFixed(4)}</p>
+            </div>
+          `;
+          pontosList.appendChild(card);
+        });
+      }
+    }
+
+    async function carregarResumo() {
+      if (!viagemId) return;
+
+      $('viajante-loading').classList.remove('hidden');
+      try {
+        const data = await apiFetch(`/api/roteiro/${viagemId}/resumo`);
+        renderResumo(data);
+      } catch (err) {
+        $('viajante-loading').classList.add('hidden');
+        const errEl = $('api-error');
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    async function carregarMinhasReservas() {
+      if (!viagemId) return;
+
+      try {
+        const lista = await apiFetch(`/api/reservas/viagem/${viagemId}`);
+        const tbody = $('tabela-minhas-reservas');
+        tbody.innerHTML = '';
+
+        $('card-minhas-compras').classList.toggle('hidden', lista.length === 0);
+
+        if (lista.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="py-3 text-slate-500">Nenhum pacote reservado nesta viagem ainda.</td></tr>';
+          return;
+        }
+
+        lista.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          const statusClass = r.status === 'Pago' || r.status === 'Confirmada'
+            ? 'bg-emerald-900/50 text-emerald-300'
+            : 'bg-amber-900/50 text-amber-300';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-slate-500">#${r.id}</td>
+            <td class="py-2 pr-3 font-medium">${escapeHtml(r.pacoteTitulo || 'Pacote')}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(r.hospedagem)}</td>
+            <td class="py-2 pr-3">
+              <span class="px-2 py-0.5 rounded-full text-xs ${statusClass}">${escapeHtml(r.status)}</span>
+            </td>
+            <td class="py-2 text-emerald-300">${formatMoney(r.valorTotal)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Gestão: Hospedagens ----------
+    async function carregarHospedagens() {
+      try {
+        const lista = await apiFetch('/api/hospedagens');
+        const tbody = $('tabela-hospedagens');
+        tbody.innerHTML = '';
+
+        if (lista.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-3 text-slate-500">Nenhuma hospedagem cadastrada.</td></tr>';
+          return;
+        }
+
+        lista.forEach(h => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-slate-500">${h.id}</td>
+            <td class="py-2 pr-3 font-medium">${escapeHtml(h.nome)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(h.endereco)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(h.destinoNome)}</td>
+            <td class="py-2">
+              <button data-del-hosp="${h.id}"
+                class="px-3 py-1 rounded-lg bg-rose-900/50 border border-rose-800 hover:bg-rose-800/60 text-rose-200 text-xs transition">
+                Remover
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('[data-del-hosp]').forEach(btn =>
+          btn.addEventListener('click', () => removerHospedagem(btn.dataset.delHosp)));
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function adicionarHospedagem() {
+      const nome = $('hosp-nome').value.trim();
+      const endereco = $('hosp-endereco').value.trim();
+      if (!nome || !endereco) {
+        showToast('Preencha nome e endereço da hospedagem.', 'error');
+        return;
+      }
+
+      try {
+        await apiFetch('/api/hospedagens', {
+          method: 'POST',
+          body: JSON.stringify({ destinoId: 1, nome, endereco })
+        });
+        $('hosp-nome').value = '';
+        $('hosp-endereco').value = '';
+        showToast('Hospedagem criada com sucesso!');
+        carregarHospedagens();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function removerHospedagem(id) {
+      try {
+        await apiFetch(`/api/hospedagens/${id}`, { method: 'DELETE' });
+        showToast(`Hospedagem #${id} removida.`);
+        carregarHospedagens();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Gestão: Pontos Turísticos ----------
+    async function carregarPontos() {
+      try {
+        const lista = await apiFetch('/api/pontos-turisticos');
+        const tbody = $('tabela-pontos');
+        tbody.innerHTML = '';
+
+        if (lista.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-3 text-slate-500">Nenhum ponto cadastrado.</td></tr>';
+          return;
+        }
+
+        lista.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-slate-500">${p.id}</td>
+            <td class="py-2 pr-3 font-medium">${escapeHtml(p.nome)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(p.categoria)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(p.destinoNome)}</td>
+            <td class="py-2">
+              <button data-del-ponto="${p.id}"
+                class="px-3 py-1 rounded-lg bg-rose-900/50 border border-rose-800 hover:bg-rose-800/60 text-rose-200 text-xs transition">
+                Remover
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('[data-del-ponto]').forEach(btn =>
+          btn.addEventListener('click', () => removerPonto(btn.dataset.delPonto)));
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function adicionarPonto() {
+      const nome = $('ponto-nome').value.trim();
+      const categoria = $('ponto-categoria').value.trim();
+      if (!nome || !categoria) {
+        showToast('Preencha nome e categoria do ponto turístico.', 'error');
+        return;
+      }
+
+      try {
+        await apiFetch('/api/pontos-turisticos', {
+          method: 'POST',
+          body: JSON.stringify({
+            destinoId: 1,
+            nome,
+            categoria,
+            latitude: -10.1844,
+            longitude: -48.3336
+          })
+        });
+        $('ponto-nome').value = '';
+        $('ponto-categoria').value = '';
+        showToast('Ponto turístico criado com sucesso!');
+        carregarPontos();
+        carregarResumo();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function removerPonto(id) {
+      try {
+        await apiFetch(`/api/pontos-turisticos/${id}`, { method: 'DELETE' });
+        showToast(`Ponto turístico #${id} removido.`);
+        carregarPontos();
+        carregarResumo();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Gestão: Roteiros Diários ----------
+    async function carregarRoteiros() {
+      try {
+        const lista = await apiFetch(`/api/roteiro/${viagemId || VIAGEM_DEMO_ID}/diarios`);
+        const tbody = $('tabela-roteiros');
+        tbody.innerHTML = '';
+
+        if (lista.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="py-3 text-slate-500">Nenhum roteiro diário cadastrado.</td></tr>';
+          return;
+        }
+
+        lista.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-slate-500">${r.id}</td>
+            <td class="py-2 pr-3">${formatDate(r.data)}</td>
+            <td class="py-2 pr-3 text-slate-300">${escapeHtml(r.descricao)}</td>
+            <td class="py-2">
+              <button data-del-roteiro="${r.id}"
+                class="px-3 py-1 rounded-lg bg-rose-900/50 border border-rose-800 hover:bg-rose-800/60 text-rose-200 text-xs transition">
+                Remover
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('[data-del-roteiro]').forEach(btn =>
+          btn.addEventListener('click', () => removerRoteiro(btn.dataset.delRoteiro)));
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function adicionarRoteiro() {
+      const data = $('roteiro-data').value;
+      const descricao = $('roteiro-descricao').value.trim();
+      if (!data || !descricao) {
+        showToast('Preencha a data e a descrição do roteiro.', 'error');
+        return;
+      }
+
+      try {
+        await apiFetch('/api/roteiro/diarios', {
+          method: 'POST',
+          body: JSON.stringify({ viagemId: viagemId || VIAGEM_DEMO_ID, data, descricao })
+        });
+        $('roteiro-descricao').value = '';
+        showToast('Roteiro diário adicionado!');
+        carregarRoteiros();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function removerRoteiro(id) {
+      try {
+        await apiFetch(`/api/roteiro/diarios/${id}`, { method: 'DELETE' });
+        showToast(`Roteiro #${id} removido.`);
+        carregarRoteiros();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Pacotes prontos (vitrine) ----------
+    let todosPacotes = [];
+    let meusPacotes = [];
+
+    function nomeMes(ano, mes) {
+      return new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    }
+
+    function preencherFiltroMes() {
+      const select = $('filtro-mes');
+      const atual = select.value;
+      const meses = [...new Set(todosPacotes.map(p => {
+        const d = new Date(p.dataInicio);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      }))].sort();
+
+      select.innerHTML = '<option value="">Todos os meses</option>';
+      meses.forEach(m => {
+        const [ano, mes] = m.split('-').map(Number);
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = nomeMes(ano, mes);
+        select.appendChild(opt);
+      });
+      if (meses.includes(atual)) select.value = atual;
+    }
+
+    function renderPacotesVitrine() {
+      const filtro = $('filtro-mes').value;
+      const grid = $('pacotes-grid');
+      grid.innerHTML = '';
+
+      const lista = filtro
+        ? todosPacotes.filter(p => {
+            const d = new Date(p.dataInicio);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === filtro;
+          })
+        : todosPacotes;
+
+      $('pacotes-vazio').classList.toggle('hidden', lista.length > 0);
+
+      lista.forEach(p => {
+        const dias = (p.dias || []).map(d =>
+          `<li class="flex gap-2"><span class="text-violet-400 font-semibold shrink-0">Dia ${d.numeroDia}</span><span class="text-slate-400">${escapeHtml(d.descricao)}</span></li>`
+        ).join('');
+
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-3 hover:border-violet-700/60 transition';
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="font-bold text-base">${escapeHtml(p.titulo)}</h3>
+              <span class="px-2 py-0.5 rounded-full bg-violet-900/60 text-violet-200 text-xs whitespace-nowrap">${formatDate(p.dataInicio)}</span>
+            </div>
+            <p class="text-sm text-slate-400 mt-1">📍 ${escapeHtml(p.destinoNome)}, ${escapeHtml(p.destinoPais)}</p>
+            <div class="mt-2">${labelHotelPacote(p.hospedagemNome)}</div>
+          </div>
+          ${p.descricao ? `<p class="text-sm text-slate-300">${escapeHtml(p.descricao)}</p>` : ''}
+          ${dias ? `<ul class="text-xs space-y-1 max-h-28 overflow-y-auto pr-1">${dias}</ul>` : ''}
+          ${stripGuiaPacote(p)}
+          <div class="mt-auto pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+            <div>
+              <p class="text-xs text-slate-500">${formatDate(p.dataInicio)} → ${formatDate(p.dataFim)}</p>
+              <p class="text-lg font-bold text-emerald-300">${formatMoney(p.preco)}</p>
+            </div>
+            ${currentRole === 'Viajante'
+              ? `<button data-reservar-pacote="${p.id}" class="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-sm font-semibold transition">Reservar pacote</button>`
+              : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll('[data-reservar-pacote]').forEach(btn =>
+        btn.addEventListener('click', () => reservarPacote(btn.dataset.reservarPacote)));
+      grid.querySelectorAll('[data-ver-guia]').forEach(btn =>
+        btn.addEventListener('click', () => abrirPerfilGuia(btn.dataset.verGuia)));
+    }
+
+    async function carregarFiltrosPacotes() {
+      try {
+        const destinos = await publicFetch('/api/public/destinos');
+        const sel = $('filtro-destino');
+        const atual = sel.value;
+        sel.innerHTML = '<option value="">Todos os destinos</option>';
+        destinos.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          opt.textContent = d.nome;
+          sel.appendChild(opt);
+        });
+        if (atual) sel.value = atual;
+      } catch { /* ignora */ }
+    }
+
+    async function carregarPacotesVitrine() {
+      try {
+        const params = new URLSearchParams();
+        const destinoId = $('filtro-destino').value;
+        const mesVal = $('filtro-mes').value;
+        if (destinoId) params.set('destinoId', destinoId);
+        if (mesVal) {
+          const [ano, mes] = mesVal.split('-');
+          params.set('ano', ano);
+          params.set('mes', mes);
+        }
+        const qs = params.toString();
+        todosPacotes = await apiFetch(`/api/pacotes${qs ? '?' + qs : ''}`);
+        preencherFiltroMes();
+        renderPacotesVitrine();
+        if (currentRole === 'Guia') carregarPacotesGestao();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function carregarPacotesGestao() {
+      try {
+        meusPacotes = await apiFetch('/api/pacotes/meus');
+        renderPacotesGestao();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function carregarCarteira() {
+      try {
+        const itens = await apiFetch('/api/viagens/minha/carteira');
+        const tbody = $('tabela-carteira');
+        tbody.innerHTML = '';
+
+        if (itens.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-3 text-slate-500">Nenhuma viagem ainda. Reserve um pacote acima!</td></tr>';
+          return;
+        }
+
+        itens.forEach(item => {
+          const statusClass = item.status === 'Pago'
+            ? 'bg-emerald-900/50 text-emerald-300'
+            : 'bg-amber-900/50 text-amber-300';
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60 cursor-pointer hover:bg-slate-800/40';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 font-medium">${escapeHtml(item.destino)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(item.pacoteTitulo || '—')}</td>
+            <td class="py-2 pr-3 text-slate-400">${formatDate(item.dataInicio)} → ${formatDate(item.dataFim)}</td>
+            <td class="py-2 pr-3 text-emerald-300">${item.valorTotal > 0 ? formatMoney(item.valorTotal) : '—'}</td>
+            <td class="py-2"><span class="px-2 py-0.5 rounded-full text-xs ${statusClass}">${escapeHtml(item.status)}</span></td>
+          `;
+          tr.addEventListener('click', () => {
+            viagemId = item.viagemId;
+            viagemDoViajante = true;
+            mostrarPainelViagem();
+            carregarResumo();
+          });
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function carregarVendasGuia() {
+      try {
+        const data = await apiFetch('/api/financeiro/guia/vendas');
+        $('guia-bruto').textContent = formatMoney(data.faturamentoBrutoTotal);
+        $('guia-taxa').textContent = formatMoney(data.taxaPlataformaTotal);
+        $('guia-taxa-pct').textContent = `Taxa: ${data.taxaIntermediacaoPercentual}%`;
+        $('guia-liquido').textContent = formatMoney(data.faturamentoLiquidoTotal);
+
+        const tbody = $('tabela-vendas-guia');
+        tbody.innerHTML = data.vendas.length === 0
+          ? '<tr><td colspan="5" class="py-3 text-slate-500">Nenhuma venda ainda.</td></tr>'
+          : '';
+
+        data.vendas.forEach(v => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 font-medium">${escapeHtml(v.pacoteTitulo)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(v.destino)}</td>
+            <td class="py-2 pr-3 text-emerald-300">${formatMoney(v.faturamentoBruto)}</td>
+            <td class="py-2 pr-3 text-rose-300">-${formatMoney(v.taxaPlataforma)}</td>
+            <td class="py-2 text-sky-300 font-semibold">${formatMoney(v.faturamentoLiquido)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function reservarPacote(id) {
+      try {
+        const r = await apiFetch(`/api/pacotes/${id}/reservar`, { method: 'POST' });
+        showToast(
+          `Pacote reservado! Viagem #${r.viagemId} para ${r.destinoNome} — ${formatMoney(r.valorTotal)}`
+        );
+        if (currentRole === 'Viajante') {
+          await carregarCarteira();
+          viagemId = r.viagemId;
+          viagemDoViajante = true;
+          mostrarPainelViagem();
+          await carregarResumo();
+          await carregarMinhasReservas();
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Gestão: Pacotes (somente Guia) ----------
+    function renderPacotesGestao() {
+      const tbody = $('tabela-pacotes');
+      tbody.innerHTML = '';
+
+      if (meusPacotes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-3 text-slate-500">Você ainda não publicou nenhum pacote.</td></tr>';
+        return;
+      }
+
+      meusPacotes.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-800/60';
+        tr.innerHTML = `
+          <td class="py-2 pr-3 text-slate-500">${p.id}</td>
+          <td class="py-2 pr-3 font-medium">${escapeHtml(p.titulo)}</td>
+          <td class="py-2 pr-3 text-slate-400">${escapeHtml(p.destinoNome)}</td>
+          <td class="py-2 pr-3 text-slate-400">${formatDate(p.dataInicio)} → ${formatDate(p.dataFim)}</td>
+          <td class="py-2 pr-3 text-slate-400">${escapeHtml(p.hospedagemNome || 'A combinar')}</td>
+          <td class="py-2 pr-3 text-emerald-300">${formatMoney(p.preco)}</td>
+          <td class="py-2">
+            <button data-del-pacote="${p.id}"
+              class="px-3 py-1 rounded-lg bg-rose-900/50 border border-rose-800 hover:bg-rose-800/60 text-rose-200 text-xs transition">
+              Remover
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll('[data-del-pacote]').forEach(btn =>
+        btn.addEventListener('click', () => removerPacote(btn.dataset.delPacote)));
+    }
+
+    async function carregarSelectsPacote() {
+      try {
+        const [destinos, hospedagens] = await Promise.all([
+          apiFetch('/api/destinos'),
+          apiFetch('/api/hospedagens')
+        ]);
+
+        const selDestino = $('pacote-destino');
+        selDestino.innerHTML = '<option value="">Destino...</option>';
+        destinos.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          opt.textContent = `${d.cidade}, ${d.pais}`;
+          selDestino.appendChild(opt);
+        });
+
+        window._hospedagensPacote = hospedagens;
+        atualizarHospedagensPacote();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function atualizarHospedagensPacote() {
+      const destinoId = Number($('pacote-destino').value);
+      const sel = $('pacote-hospedagem');
+      const lista = (window._hospedagensPacote || []).filter(h => !destinoId || h.destinoId === destinoId);
+      sel.innerHTML = '<option value="">A combinar (sem hotel definido)</option>';
+      lista.forEach(h => {
+        const opt = document.createElement('option');
+        opt.value = h.id;
+        opt.textContent = h.nome;
+        sel.appendChild(opt);
+      });
+    }
+
+    async function adicionarPacote() {
+      const titulo = $('pacote-titulo').value.trim();
+      const destinoId = Number($('pacote-destino').value);
+      const hospedagemId = Number($('pacote-hospedagem').value) || null;
+      const dataInicio = $('pacote-inicio').value;
+      const dataFim = $('pacote-fim').value;
+      const preco = Number($('pacote-preco').value);
+      const dias = $('pacote-dias').value.split('\n').map(l => l.trim()).filter(Boolean);
+
+      if (!titulo || !destinoId || !dataInicio || !dataFim || !preco) {
+        showToast('Preencha título, destino, datas e preço do pacote.', 'error');
+        return;
+      }
+
+      try {
+        await apiFetch('/api/pacotes', {
+          method: 'POST',
+          body: JSON.stringify({ titulo, destinoId, hospedagemId, dataInicio, dataFim, preco, dias })
+        });
+        $('pacote-titulo').value = '';
+        $('pacote-preco').value = '';
+        $('pacote-dias').value = '';
+        showToast('Pacote publicado na vitrine!');
+        await carregarPacotesVitrine();
+        await carregarPacotesGestao();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function removerPacote(id) {
+      try {
+        await apiFetch(`/api/pacotes/${id}`, { method: 'DELETE' });
+        showToast(`Pacote #${id} removido.`);
+        await carregarPacotesVitrine();
+        await carregarPacotesGestao();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Gestão: Destinos (Admin, com geocoding) ----------
+    async function buscarCidades() {
+      const nome = $('destino-busca').value.trim();
+      if (nome.length < 2) {
+        showToast('Digite ao menos 2 letras para buscar.', 'error');
+        return;
+      }
+
+      const box = $('cidades-resultado');
+      box.classList.remove('hidden');
+      box.innerHTML = '<p class="text-slate-500 text-sm">Buscando cidades...</p>';
+
+      try {
+        const cidades = await apiFetch(`/api/destinos/buscar-cidades?nome=${encodeURIComponent(nome)}`);
+        box.innerHTML = '';
+
+        if (cidades.length === 0) {
+          box.innerHTML = '<p class="text-slate-500 text-sm">Nenhuma cidade encontrada.</p>';
+          return;
+        }
+
+        cidades.forEach(c => {
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-slate-800/60 transition';
+          row.innerHTML = `
+            <div>
+              <p class="text-sm font-medium">${escapeHtml(c.nome)}${c.estado ? `, ${escapeHtml(c.estado)}` : ''} — ${escapeHtml(c.pais)}</p>
+              <p class="text-xs text-slate-500">${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)}</p>
+            </div>
+            <button class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold transition">Adicionar</button>
+          `;
+          row.querySelector('button').addEventListener('click', () =>
+            adicionarDestino(c));
+          box.appendChild(row);
+        });
+      } catch (err) {
+        box.innerHTML = `<p class="text-red-400 text-sm">${escapeHtml(err.message)}</p>`;
+      }
+    }
+
+    async function adicionarDestino(cidade) {
+      try {
+        const nomeCidade = cidade.estado ? `${cidade.nome} - ${cidade.estado}` : cidade.nome;
+        await apiFetch('/api/destinos', {
+          method: 'POST',
+          body: JSON.stringify({
+            cidade: nomeCidade,
+            pais: cidade.pais,
+            latitude: cidade.latitude,
+            longitude: cidade.longitude
+          })
+        });
+        showToast(`Destino "${nomeCidade}" cadastrado com coordenadas automáticas!`);
+        $('cidades-resultado').classList.add('hidden');
+        $('destino-busca').value = '';
+        carregarDestinosAdmin();
+        carregarSelectsPacote();
+        carregarDestinosPublicos('public-destinos-dashboard', null, 'public-destinos-contagem');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function carregarDestinosAdmin() {
+      try {
+        const destinos = await apiFetch('/api/destinos');
+        const tbody = $('tabela-destinos');
+        tbody.innerHTML = '';
+
+        if (destinos.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-3 text-slate-500">Nenhum destino cadastrado.</td></tr>';
+          return;
+        }
+
+        destinos.forEach(d => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-slate-500">${d.id}</td>
+            <td class="py-2 pr-3 font-medium">${escapeHtml(d.cidade)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(d.pais)}</td>
+            <td class="py-2 pr-3 text-slate-500 text-xs">${d.latitude.toFixed(4)}, ${d.longitude.toFixed(4)}</td>
+            <td class="py-2">
+              <button data-del-destino="${d.id}"
+                class="px-3 py-1 rounded-lg bg-rose-900/50 border border-rose-800 hover:bg-rose-800/60 text-rose-200 text-xs transition">
+                Remover
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('[data-del-destino]').forEach(btn =>
+          btn.addEventListener('click', () => removerDestino(btn.dataset.delDestino)));
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function removerDestino(id) {
+      try {
+        await apiFetch(`/api/destinos/${id}`, { method: 'DELETE' });
+        showToast(`Destino #${id} removido.`);
+        carregarDestinosAdmin();
+        carregarSelectsPacote();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Módulo Financeiro ----------
+    async function carregarFinanceiro() {
+      try {
+        const [resumo, despesas, reservas] = await Promise.all([
+          apiFetch('/api/financeiro/resumo'),
+          apiFetch('/api/financeiro/despesas'),
+          apiFetch('/api/financeiro/reservas')
+        ]);
+
+        $('fin-volume').textContent = formatMoney(resumo.volumeTotal);
+        $('fin-taxa-plataforma').textContent = formatMoney(resumo.taxaPlataformaTotal);
+        $('fin-taxa-pct').textContent = `Taxa de intermediação: ${resumo.taxaIntermediacaoPercentual}%`;
+        $('fin-repasse').textContent = formatMoney(resumo.repasseGuiasTotal);
+        $('fin-qtd-vendas').textContent = resumo.quantidadeVendas;
+
+        const tbodyD = $('tabela-despesas');
+        tbodyD.innerHTML = despesas.length === 0
+          ? '<tr><td colspan="6" class="py-3 text-slate-500">Nenhuma despesa registrada.</td></tr>'
+          : '';
+
+        despesas.forEach(d => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-slate-500">${d.id}</td>
+            <td class="py-2 pr-3">${escapeHtml(d.descricao)}</td>
+            <td class="py-2 pr-3 text-slate-400">${escapeHtml(d.categoria)}</td>
+            <td class="py-2 pr-3 text-rose-300">${formatMoney(d.valor)}</td>
+            <td class="py-2 pr-3 text-slate-400">${d.reservaId ? '#' + d.reservaId : '—'}</td>
+            <td class="py-2">
+              <button data-del-despesa="${d.id}"
+                class="px-3 py-1 rounded-lg bg-rose-900/50 border border-rose-800 hover:bg-rose-800/60 text-rose-200 text-xs transition">
+                Excluir
+              </button>
+            </td>
+          `;
+          tbodyD.appendChild(tr);
+        });
+
+        tbodyD.querySelectorAll('[data-del-despesa]').forEach(btn =>
+          btn.addEventListener('click', () => removerDespesa(btn.dataset.delDespesa)));
+
+        const tbodyR = $('tabela-reservas');
+        tbodyR.innerHTML = reservas.length === 0
+          ? '<tr><td colspan="5" class="py-3 text-slate-500">Nenhuma reserva registrada.</td></tr>'
+          : '';
+
+        reservas.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-800/60';
+          tr.innerHTML = `
+            <td class="py-2 pr-3 text-slate-500">${r.id}</td>
+            <td class="py-2 pr-3">${escapeHtml(r.hospedagem)}</td>
+            <td class="py-2 pr-3"><span class="px-2 py-0.5 rounded-full bg-emerald-900/50 text-emerald-300 text-xs">${escapeHtml(r.status)}</span></td>
+            <td class="py-2 pr-3 text-emerald-300">${formatMoney(r.valorTotal)}</td>
+            <td class="py-2 pr-3 text-rose-300 text-xs">${r.taxaPlataforma > 0 ? formatMoney(r.taxaPlataforma) : '—'}</td>
+            <td class="py-2 text-slate-400">${escapeHtml(r.guiaNome || '—')}</td>
+          `;
+          tbodyR.appendChild(tr);
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function removerDespesa(id) {
+      try {
+        await apiFetch(`/api/financeiro/despesas/${id}`, { method: 'DELETE' });
+        showToast(`Despesa #${id} excluída.`);
+        carregarFinanceiro();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ---------- Área pública ----------
+    function renderDestinosPublicos(destinos, containerId, contagemId) {
+      const container = $(containerId);
+      container.innerHTML = '';
+
+      if (!destinos || destinos.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-sm">Nenhum destino cadastrado.</p>';
+        if (contagemId) {
+          const el = $(contagemId);
+          el.classList.add('hidden');
+          el.textContent = '';
+        }
+        return;
+      }
+
+      const totalPontos = destinos.reduce((s, d) => s + (d.totalPontosTuristicos || 0), 0);
+      if (contagemId) {
+        const el = $(contagemId);
+        el.textContent = `${destinos.length} destinos · ${totalPontos} pontos turísticos no catálogo`;
+        el.classList.remove('hidden');
+      }
+
+      destinos.forEach((d) => {
+        const destaques = (d.pontosDestaque || [])
+          .slice(0, 4)
+          .map((p) => `<span class="inline-block px-1.5 py-0.5 rounded bg-slate-700/80 text-slate-300 text-[10px]">${escapeHtml(p)}</span>`)
+          .join('');
+
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-lg bg-slate-800/80 border border-slate-700 text-sm';
+        card.innerHTML = `
+          <p class="font-semibold text-amber-200">${escapeHtml(d.nome)}</p>
+          <p class="text-slate-400 text-xs">${escapeHtml(d.pais)}</p>
+          <p class="text-xs text-amber-500/70 mt-1">${d.totalPontosTuristicos || 0} ponto(s) turístico(s)</p>
+          ${destaques ? `<div class="flex flex-wrap gap-1 mt-2">${destaques}</div>` : ''}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function carregarDestinosPublicos(containerId, erroId, contagemId) {
+      const erroEl = erroId ? $(erroId) : null;
+      if (erroEl) erroEl.classList.add('hidden');
+
+      try {
+        const destinos = await publicFetch('/api/public/destinos');
+        renderDestinosPublicos(destinos, containerId, contagemId);
+      } catch (err) {
+        if (erroEl) {
+          erroEl.textContent = err.message;
+          erroEl.classList.remove('hidden');
+        } else {
+          showToast(err.message, 'error');
+        }
+      }
+    }
+
+    // ---------- Autenticação ----------
+    function entrarComToken(auth) {
+      localStorage.setItem(STORAGE_TOKEN, auth.token);
+      const claims = getClaimsFromToken(auth.token);
+      const role = claims.role || auth.role;
+      enterDashboard(auth.email, role);
+      showToast(`Conta autenticada. Papel: ${role}`);
+    }
+
+    async function fazerLogin(email, senha) {
+      const auth = await apiFetch('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, senha })
+      });
+      entrarComToken(auth);
+    }
+
+    async function fazerCadastro() {
+      const role = $('reg-role').value;
+      const payload = {
+        nome: $('reg-nome').value.trim(),
+        email: $('reg-email').value.trim(),
+        senha: $('reg-senha').value,
+        role
+      };
+
+      if (role === 'Viajante') {
+        const pref = $('reg-preferencias').value.trim();
+        if (pref) payload.preferenciasViagem = pref;
+      } else if (role === 'Guia') {
+        const esp = $('reg-especialidade').value.trim();
+        if (!esp) throw new Error('Informe a especialidade para cadastro como Guia.');
+        payload.especialidade = esp;
+      }
+
+      const auth = await apiFetch('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      entrarComToken(auth);
+    }
+
+    $('tab-login').addEventListener('click', () => showAuthTab('login'));
+    $('tab-register').addEventListener('click', () => showAuthTab('register'));
+    $('reg-role').addEventListener('change', atualizarCamposRegistro);
+
+    $('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('login-error').classList.add('hidden');
+      try {
+        await fazerLogin($('login-email').value, $('login-senha').value);
+      } catch (err) {
+        showLoginError(err.message);
+      }
+    });
+
+    $('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('login-error').classList.add('hidden');
+      try {
+        await fazerCadastro();
+      } catch (err) {
+        showLoginError(err.message);
+      }
+    });
+
+    // ---------- Eventos ----------
+    $('planejar-form').addEventListener('submit', salvarPlanejamento);
+    $('btn-ir-pacotes').addEventListener('click', async () => {
+      await sincronizarFiltrosComPlanejamento();
+      $('section-pacotes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $('modal-guia-fechar').addEventListener('click', fecharModalGuia);
+    $('btn-solicitar-pacote').addEventListener('click', abrirModalSolicitar);
+    $('modal-solicitar-cancelar').addEventListener('click', () => $('modal-solicitar').classList.add('hidden'));
+    $('form-solicitar').addEventListener('submit', enviarSolicitacao);
+    $('modal-responder-cancelar').addEventListener('click', () => $('modal-responder').classList.add('hidden'));
+    $('form-responder').addEventListener('submit', enviarPropostaGuia);
+    $('filtro-mes').addEventListener('change', carregarPacotesVitrine);
+    $('filtro-destino').addEventListener('change', carregarPacotesVitrine);
+    $('btn-add-pacote').addEventListener('click', adicionarPacote);
+    $('pacote-destino').addEventListener('change', atualizarHospedagensPacote);
+    $('btn-buscar-cidade').addEventListener('click', buscarCidades);
+    $('destino-busca').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); buscarCidades(); }
+    });
+    $('btn-add-hosp').addEventListener('click', adicionarHospedagem);
+    $('btn-add-ponto').addEventListener('click', adicionarPonto);
+    $('btn-add-roteiro').addEventListener('click', adicionarRoteiro);
+
+    $('btn-logout').addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_TOKEN);
+      currentRole = null;
+      resetEstadoViagem();
+      $('dashboard').classList.add('hidden');
+      $('login-screen').classList.remove('hidden');
+      showAuthTab('login');
+    });
+
+    // ---------- Inicialização ----------
+    atualizarCamposRegistro();
+    $('roteiro-data').valueAsDate = new Date();
+    carregarDestinosPublicos('public-destinos-list', 'public-destinos-erro');
+
+    const tokenSalvo = getToken();
+    if (tokenSalvo) {
+      const claims = getClaimsFromToken(tokenSalvo);
+      if (claims.role) {
+        enterDashboard(claims.email || 'sessão restaurada', claims.role);
+      } else {
+        localStorage.removeItem(STORAGE_TOKEN);
+      }
+    }
+  </script>
+</body>
+</html>
