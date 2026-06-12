@@ -440,7 +440,7 @@
           </div>
         </div>
 
-        <div class="grid xl:grid-cols-2 gap-8">
+        <div>
           <!-- Pontos turísticos -->
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
             <h3 class="text-lg font-semibold mb-1">📍 Pontos Turísticos</h3>
@@ -465,7 +465,7 @@
                     <th class="py-2 pr-3">Nome</th>
                     <th class="py-2 pr-3">Categoria</th>
                     <th class="py-2 pr-3">Destino</th>
-                    <th class="py-2">Ações</th>
+                    <th id="pontos-col-acoes" class="py-2">Ações</th>
                   </tr>
                 </thead>
                 <tbody id="tabela-pontos"></tbody>
@@ -473,8 +473,8 @@
             </div>
           </div>
 
-          <!-- Roteiros diários -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <!-- Roteiros diários (oculto na demo — backend mantido) -->
+          <div id="section-roteiros-guia" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6">
             <h3 class="text-lg font-semibold mb-1">🗓️ Roteiros Diários</h3>
             <p class="text-xs text-slate-500 mb-4">Detalhe o dia a dia das viagens que você acompanha.</p>
 
@@ -873,6 +873,7 @@
       $('section-ofertas-guia').classList.toggle('hidden', !isGuia);
       $('section-financeiro').classList.toggle('hidden', !isAdmin);
       $('section-vendas-guia').classList.toggle('hidden', !isGuia);
+      if ($('pontos-col-acoes')) $('pontos-col-acoes').classList.toggle('hidden', isGuia);
 
       const badge = $('role-badge');
       const styles = {
@@ -911,7 +912,6 @@
         carregarSelectsPacote();
         carregarPacotesGestao();
         carregarPontos();
-        carregarRoteiros();
         carregarVendasGuia();
       }
       if (currentRole === 'Admin') {
@@ -1489,8 +1489,11 @@
         const tbody = $('tabela-pontos');
         tbody.innerHTML = '';
 
+        const podeRemoverPonto = currentRole !== 'Guia';
+        const cols = podeRemoverPonto ? 5 : 4;
+
         if (lista.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" class="py-3 text-slate-500">Nenhum ponto cadastrado.</td></tr>';
+          tbody.innerHTML = `<tr><td colspan="${cols}" class="py-3 text-slate-500">Nenhum ponto cadastrado.</td></tr>`;
           return;
         }
 
@@ -1502,18 +1505,20 @@
             <td class="py-2 pr-3 font-medium">${escapeHtml(p.nome)}</td>
             <td class="py-2 pr-3 text-slate-400">${escapeHtml(p.categoria)}</td>
             <td class="py-2 pr-3 text-slate-400">${escapeHtml(p.destinoNome)}</td>
-            <td class="py-2">
+            ${podeRemoverPonto ? `<td class="py-2">
               <button data-del-ponto="${p.id}"
                 class="px-3 py-1 rounded-lg bg-rose-900/50 border border-rose-800 hover:bg-rose-800/60 text-rose-200 text-xs transition">
                 Remover
               </button>
-            </td>
+            </td>` : ''}
           `;
           tbody.appendChild(tr);
         });
 
-        tbody.querySelectorAll('[data-del-ponto]').forEach(btn =>
-          btn.addEventListener('click', () => removerPonto(btn.dataset.delPonto)));
+        if (podeRemoverPonto) {
+          tbody.querySelectorAll('[data-del-ponto]').forEach(btn =>
+            btn.addEventListener('click', () => removerPonto(btn.dataset.delPonto)));
+        }
       } catch (err) {
         showToast(err.message, 'error');
       }
